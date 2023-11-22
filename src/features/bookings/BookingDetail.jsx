@@ -14,6 +14,9 @@ import Spinner from "../../ui/Spinner";
 import { useBooking } from "./useBooking";
 import { useMoveBack } from "../../hooks/useMoveBack";
 import { useCheckOut } from "../check-in-out/useCheckOut";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import { useDeleteBooking } from "./useDeleteBooking";
 
 const HeadingGroup = styled.div`
 	display: flex;
@@ -24,6 +27,7 @@ const HeadingGroup = styled.div`
 function BookingDetail() {
 	const { booking, isLoading } = useBooking();
 	const { checkOut, isCheckingOut } = useCheckOut();
+	const { deleteBooking, isDeleting } = useDeleteBooking();
 
 	const moveBack = useMoveBack();
 	const navigate = useNavigate();
@@ -51,10 +55,6 @@ function BookingDetail() {
 			<BookingDataBox booking={booking} />
 
 			<ButtonGroup>
-				<Button $variation="secondary" onClick={moveBack}>
-					Back
-				</Button>
-
 				{status === "unconfirmed" && (
 					<Button
 						icon={<HiArrowDownOnSquare />}
@@ -74,6 +74,25 @@ function BookingDetail() {
 						Check out
 					</Button>
 				)}
+
+				<Modal>
+					<Modal.Open opens="delete">
+						<Button $variation="danger">Delete booking</Button>
+					</Modal.Open>
+					<Modal.Window name="delete">
+						<ConfirmDelete
+							resourceName="booking"
+							disabled={isDeleting}
+							onConfirm={() =>
+								deleteBooking(bookingId, { onSettled: () => navigate(-1) })
+							}
+						/>
+					</Modal.Window>
+				</Modal>
+
+				<Button $variation="secondary" onClick={moveBack}>
+					Back
+				</Button>
 			</ButtonGroup>
 		</>
 	);
